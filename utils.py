@@ -39,11 +39,48 @@ def find_best_loglikelihood(results):
 
     return best_index
 
+
 def plot_line_graph(evaluation_metric:list, title:str):
     plt.figure(figsize=(8, 6))
     plt.plot(range(2, 2 + len(evaluation_metric)), evaluation_metric, marker='o')
     plt.xlabel('Number of Segments (K)')
     plt.ylabel(title)
     plt.title(f'{title} vs Number of Segments (K)')
+    plt.grid(True)
+    plt.show()
+
+
+def plot_probabilities(results: dict, K: int, X: np.ndarray):
+    theta = results[f"{K}"]['theta']
+
+    # Filter prices greater than 3
+    mask = X[:, 1] >= 3
+    X_filtered = X[mask]
+
+    # Sort by price so the line is not jagged
+    sort_idx = np.argsort(X_filtered[:, 1])
+    X_sorted = X_filtered[sort_idx]
+    prices = X_sorted[:, 1]
+
+    plt.figure(figsize=(8, 6))
+
+    for s in range(K):
+        probs = np.exp(theta[s][0] + theta[s][1] * prices) / (
+            1 + np.exp(theta[s][0] + theta[s][1] * prices)
+        )
+        # Line plot instead of scatter
+        plt.plot(
+            prices,
+            probs,
+            label=f'Segment {s+1}',
+            alpha=0.8,
+            color=plt.cm.get_cmap('tab10')(s)
+        )
+
+    plt.xlabel('Price')
+    plt.ylabel('Probability')
+    plt.title('Probability vs Price by Segment')
+    plt.xlim(3, 7)
+    plt.legend()
     plt.grid(True)
     plt.show()

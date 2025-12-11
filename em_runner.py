@@ -126,7 +126,7 @@ class EMRunner:
             print(f"EM Attempt {i+1} of {redundancy} with k={self.K}")
 
             theta, pi, log_likelihood = self.EM()
-            bic = -2 * log_likelihood + self.K * np.log(self.y.shape[1] * self.y.shape[0])
+            bic = -2 * log_likelihood + (len(theta)* 2 + len(pi)) * np.log(self.y.shape[1] * self.y.shape[0])
 
             results[i] = (theta, pi, log_likelihood, bic)
 
